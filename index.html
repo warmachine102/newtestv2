@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Recipe Generator</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #5cb85c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        #recipe-results {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .recipe-preview {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+        }
+        .recipe-preview img {
+            margin-right: 15px;
+        }
+        .view-recipe-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .view-recipe-btn:hover {
+            background-color: #0056b3;
+        }
+        #recipe-detail {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        #recipe-detail img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        .fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Basic styling for the contact form */
+        #contactForm label { margin-top: 10px; }
+        #contactForm textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        #formMessage { margin-top: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <section id="hero" class="section">
+            <h1>Welcome to the AI Recipe Generator</h1>
+            <p>Get delicious recipes based on your ingredients and preferences!</p>
+            <button id="get-started-btn">Get Started</button>
+        </section>
+
+        <section id="generate-recipes" class="section">
+            <h2>Generate Recipes</h2>
+            <label for="ingredients-input">Ingredients (comma-separated):</label>
+            <input type="text" id="ingredients-input" placeholder="e.g., chicken, broccoli, cheese">
+
+            <label for="cuisine-select">Cuisine:</label>
+            <select id="cuisine-select">
+                <option value="">Any Cuisine</option>
+                <option value="African">African</option>
+                <option value="American">American</option>
+                <option value="British">British</option>
+                <option value="Cajun">Cajun</option>
+                <option value="Caribbean">Caribbean</option>
+                <option value="Chinese">Chinese</option>
+                <option value="Eastern European">Eastern European</option>
+                <option value="European">European</option>
+                <option value="French">French</option>
+                <option value="German">German</option>
+                <option value="Greek">Greek</option>
+                <option value="Indian">Indian</option>
+                <option value="Irish">Irish</option>
+                <option value="Italian">Italian</option>
+                <option value="Japanese">Japanese</option>
+                <option value="Jewish">Jewish</option>
+                <option value="Korean">Korean</option>
+                <option value="Latin American">Latin American</option>
+                <option value="Mediterranean">Mediterranean</option>
+                <option value="Mexican">Mexican</option>
+                <option value="Middle Eastern">Middle Eastern</option>
+                <option value="Nordic">Nordic</option>
+                <option value="Southern">Southern</option>
+                <option value="Spanish">Spanish</option>
+                <option value="Thai">Thai</option>
+                <option value="Vietnamese">Vietnamese</option>
+            </select>
+
+            <label for="dietary-select">Dietary Restrictions:</label>
+            <select id="dietary-select">
+                <option value="">Any Diet</option>
+                <option value="Gluten Free">Gluten Free</option>
+                <option value="Ketogenic">Ketogenic</option>
+                <option value="Vegetarian">Vegetarian</option>
+                <option value="Lacto-Vegetarian">Lacto-Vegetarian</option>
+                <option value="Ovo-Vegetarian">Ovo-Vegetarian</option>
+                <option value="Vegan">Vegan</option>
+                <option value="Pescetarian">Pescetarian</option>
+                <option value="Paleo">Paleo</option>
+                <option value="Primal">Primal</option>
+                <option value="Low FODMAP">Low FODMAP</option>
+                <option value="Whole30">Whole30</option>
+            </select>
+
+            <label for="meal-type-select">Meal Type:</label>
+            <select id="meal-type-select">
+                <option value="">Any Meal Type</option>
+                <option value="main course">Main Course</option>
+                <option value="side dish">Side Dish</option>
+                <option value="dessert">Dessert</option>
+                <option value="appetizer">Appetizer</option>
+                <option value="salad">Salad</option>
+                <option value="bread">Bread</option>
+                <option value="breakfast">Breakfast</option>
+                <option value="soup">Soup</option>
+                <option value="beverage">Beverage</option>
+                <option value="sauce">Sauce</option>
+                <option value="marinade">Marinade</option>
+                <option value="fingerfood">Fingerfood</option>
+                <option value="snack">Snack</option>
+                <option value="drink">Drink</option>
+            </select>
+
+            <label for="cooking-time-select">Max Cooking Time:</label>
+            <select id="cooking-time-select">
+                <option value="">Any</option>
+                <option value="30">30 minutes</option>
+                <option value="60">60 minutes</option>
+                <option value="60+">60+ minutes</option>
+            </select>
+
+            <label for="meal-attributes-select">Meal Attributes:</label>
+            <select id="meal-attributes-select">
+                <option value="">Any</option>
+                <option value="healthy">Healthy</option>
+                <option value="quick">Quick</option>
+                <option value="easy">Easy</option>
+                </select>
+
+            <button id="generate-btn">Generate Recipes</button>
+
+            <div id="recipe-results">
+                </div>
+        </section>
+
+        <section id="recipe-detail" class="section">
+            <h2>Recipe Details</h2>
+            <h3 id="recipe-detail-title"></h3>
+            <img id="recipe-detail-image" src="" alt="Recipe Image" style="max-width: 300px;">
+            <p id="recipe-detail-time"></p>
+            <p id="recipe-detail-ingredients"></p>
+            <p id="recipe-detail-steps"></p>
+            <p id="recipe-detail-nutrition"></p>
+            <p id="recipe-detail-tips"></p>
+            <button onclick="document.getElementById('recipe-detail').style.display='none'; document.getElementById('generate-recipes').scrollIntoView({ behavior: 'smooth' });">Back to Results</button>
+        </section>
+
+        <section id="contact" class="section">
+            <h2>Contact Us</h2>
+            <form id="contactForm">
+                <label for="name">Name:</label>
+                <input type="text" id="name" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+
+                <label for="phone">Phone (Optional):</label>
+                <input type="text" id="phone">
+
+                <label for="subject">Subject:</label>
+                <input type="text" id="subject">
+
+                <label for="message">Message:</label>
+                <textarea id="message" rows="5" required></textarea>
+
+                <button type="submit">Submit Feedback</button>
+                <p id="formMessage"></p>
+            </form>
+        </section>
+
+        <section id="footer" class="section">
+            <p>&copy; 2025 AI Recipe Generator</p>
+        </section>
+    </div>
+
+    <script>
+        document.getElementById('get-started-btn').addEventListener('click', function() {
+            document.getElementById('generate-recipes').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        document.getElementById('generate-btn').addEventListener('click', function() {
+            const ingredients = document.getElementById('ingredients-input').value;
+            const cuisine = document.getElementById('cuisine-select').value;
+            const dietary = document.getElementById('dietary-select').value;
+            const mealType = document.getElementById('meal-type-select').value;
+            const cookingTime = document.getElementById('cooking-time-select').value;
+            const mealAttributes = document.getElementById('meal-attributes-select').value; // We might not use this directly with Spoonacular
+
+            const apiKey = '22379668fc0642c1b19cc08530434133';
+            const spoonacularApiEndpoint = 'https://api.spoonacular.com/recipes/findByIngredients';
+
+            let apiUrl = `${spoonacularApiEndpoint}?apiKey=${apiKey}&ingredients=${encodeURIComponent(ingredients)}`;
+
+            if (cuisine) {
+                apiUrl += `&cuisine=${encodeURIComponent(cuisine)}`;
+            }
+            if (dietary) {
+                apiUrl += `&diet=${encodeURIComponent(dietary)}`;
+            }
+            if (mealType) {
+                apiUrl += `&type=${encodeURIComponent(mealType)}`;
+            }
+            if (cookingTime) {
+                const timeInMinutes = parseInt(cookingTime);
+                if (!isNaN(timeInMinutes) && cookingTime !== '60+') {
+                    apiUrl += `&maxReadyTime=${timeInMinutes}`;
+                } else if (cookingTime === '60+') {
+                    apiUrl += `&maxReadyTime=90`; // Or some other reasonable upper limit
+                }
+            }
+
+            // We are not directly using 'mealAttributes' here with this Spoonacular endpoint.
+            // You might need to adjust your dietary selection or use a different Spoonacular endpoint for specific attributes.
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && Array.isArray(data) && data.length > 0) {
+                        const formattedRecipes = data.map(recipe => ({
+                            title: recipe.title,
+                            image: recipe.image,
+                            ingredients: recipe.usedIngredients.map(ing => ing.originalString).concat(recipe.missedIngredients.map(ing => ing.originalString)),
+                            // Spoonacular's findByIngredients doesn't directly return steps.
+                            // We would need to make another API call to get the recipe details.
+                            // For this example, we'll leave steps empty and handle it in displayRecipeDetails.
+                            steps:,
+                            time: recipe.readyInMinutes ? `${recipe.readyInMinutes} minutes` : 'Unknown',
+                            nutrition: 'Not available (requires another API call)',
+                            tips: 'No tips available (requires another API call)'
+                        }));
+                        displayRecipes(formattedRecipes);
+                    } else {
+                        document.getElementById('recipe-results').innerHTML = '<p>No recipes found based on your criteria.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching recipes:', error);
+                    document.getElementById('recipe-results').innerHTML = '<p>Error fetching recipes. Please try again later.</p>';
+                });
+        });
+
+        function generateMockRecipes(ingredients, cuisine, dietary, mealType, cookingTime, mealAttributes) {
+            console.warn("generateMockRecipes is being called. Ensure your AI service integration is complete.");
+            return;
+        }
+
+        function displayRecipes(recipes) {
+            const resultsDiv = document.getElementById('recipe-results');
+            resultsDiv.innerHTML = '';
+
+            if (recipes.length === 0) {
+                resultsDiv.innerHTML = '<p>No recipes found.</p>';
+                return;
+            }
+
+            recipes.forEach(recipe => {
+                const recipeDiv = document.createElement('div');
+                recipeDiv.classList.add('recipe-preview');
+                recipeDiv.innerHTML = `
+                    <h3>${recipe.title}</h3>
+                    <img src="${recipe.image}" alt="${recipe.title}" style="max-width: 150px;">
+                    <button class="view-recipe-btn" data-recipe-id="${recipe.id}">View Recipe</button>
+                `;
+                resultsDiv.appendChild(recipeDiv);
+            });
+
+            document.querySelectorAll('.view-recipe-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const recipeId = this.getAttribute('data-recipe-id');
+                    // We need to make another API call to get the recipe details by ID
+                    fetchRecipeDetails(recipeId);
+                });
+            });
+        }
+
+        function fetchRecipeDetails(recipeId) {
+            const apiKey = '22379668fc0642c1b19cc08530434133';
+            const recipeDetailsEndpoint = `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=${apiKey}&includeNutrition=true`;
+
+            fetch(recipeDetailsEndpoint)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(recipe => {
+                    document.getElementById('recipe-detail-title').textContent = recipe.title;
+                    document.getElementById('recipe-detail-image').src = recipe.image;
+                    document.getElementById('recipe-detail-ingredients').innerHTML = '<strong>Ingredients:</strong> ' + recipe.extendedIngredients.map(ing => ing.originalString).join(', ');
+                    document.getElementById('recipe-detail-steps').innerHTML = '<strong>Steps:</strong> ' + (recipe.instructions || 'Instructions not available.');
+                    document.getElementById('recipe-detail-time').textContent = recipe.readyInMinutes ? `${recipe.readyInMinutes} minutes` : 'Unknown';
+                    document.getElementById('recipe-detail-nutrition').innerHTML = recipe.nutrition ? '<strong>Nutrition:</strong> ' + JSON.stringify(recipe.nutrition.nutrients.slice(0, 5).map(n => `${n.name}: ${n.amount} ${n.unit}`).join(', ')) : '<strong>Nutrition:</strong> Not available.';
+                    document.getElementById('recipe-detail-tips').innerHTML = recipe.dishTypes ? '<strong>Dish Types:</strong> ' + recipe.dishTypes.join(', ') : '<strong>Dish Types:</strong> Not available.'; // Using dishTypes as a placeholder for tips
+
+                    document.getElementById('recipe-detail').style.display = 'block';
+                    document.getElementById('recipe-detail').scrollIntoView({ behavior: 'smooth' });
+                })
+                .catch(error => {
+                    console.error('Error fetching recipe details:', error);
+                    document.getElementById('recipe-detail').style.display = 'none';
+                    alert('Could not fetch recipe details.');
+                });
+        }
+
+        function displayRecipeDetails(recipe) {
+            // This function is now replaced by fetchRecipeDetails which makes an API call
+        }
+
+        // Carousel functionality (assuming you had this)
+        document.addEventListener('DOMContentLoaded', function() {
+            const carouselSlide = document.querySelector('.carousel-slide');
+            const carouselItems = document.querySelectorAll('.carousel-item');
+            const prevButton = document.querySelector('.carousel-prev');
+            const nextButton = document.querySelector('.carousel-next');
+
+            if (carouselSlide && carouselItems.length > 0 && prevButton && nextButton) {
+                let counter = 0;
+                const slideWidth = carouselItems[0].clientWidth;
+
+                carouselSlide.style.transform = `translateX(${-slideWidth * counter}px)`;
+
+                nextButton.addEventListener('click', () => {
+                    if (counter >= carouselItems.length - 1) return;
+                    carouselSlide.style.transition = "transform 0.4s ease-in-out";
+                    counter++;
+                    carouselSlide.style.transform = `translateX(${-slideWidth * counter}px)`;
+                });
+
+                prevButton.addEventListener('click', () => {
+                    if (counter <= 0) return;
+                    carouselSlide.style.transition = "transform 0.4s ease-in-out";
+                    counter--;
+                    carouselSlide.style.transform = `translateX(${-slideWidth * counter}px)`;
+                });
+
+                carouselSlide.addEventListener('transitionend', () => {
+                    if (carouselItems[counter].id === 'lastClone') {
+                        carouselSlide.style.transition = "none";
+                        counter = carouselItems.length - 2;
+                        carouselSlide.style.transform = `translateX(${-slideWidth * counter}px)`;
+                    }
+                    if (carouselItems[counter].id === 'firstClone') {
+                        carouselSlide.style.transition = "none";
+                        counter = carouselItems.length - counter;
+                        carouselSlide.style.transform = `translateX(${-slideWidth * counter}px)`;
+                    }
+                });
+            }
+        });
+
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+
+            // Basic form validation (you can add more robust validation)
+            if (!name || !email || !message) {
+                document.getElementById('formMessage').textContent = 'Please fill in all required fields.';
+                return;
+            }
+
+            // --- Handling Contact Form Submission ---
+            // 1. Construct the data payload to send to your backend.
+            const formData = {
+                name: name,
+                email: email,
+                phone: phone,
+                subject: subject,
+                message: message
+            };
+
+            // 2. Make an API call to your backend endpoint to handle the form submission.
+            // Example using fetch:
+            fetch('/api/contact', { // Replace '/api/contact' with your actual backend endpoint
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 3. Process the response from your backend (e.g., display a success message).
+                console.log('Contact form submitted successfully:', data);
+                document.getElementById('formMessage').textContent = 'Thank you for your feedback!';
+
+                // Clear form fields after successful submission
+                document.getElementById('name').value = '';
+                document.getElementById('email').value = '';
+                document.getElementById('phone').value = '';
+                document.getElementById('subject').value = '';
+                document.getElementById('message').value = '';
+            })
+            .catch(error => {
+                console.error('Error submitting contact form:', error);
+                document.getElementById('formMessage').textContent = 'Error submitting feedback. Please try again later.';
+            });
+            // --- End of Contact Form Submission ---
+        });
+
+        const sections = document.querySelectorAll('.section');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.15
+        });
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
